@@ -1,0 +1,12 @@
+[submodule "crm-object-sync"]
+	path = crm-object-sync
+	url = git@github.com:hubspotdev/crm-object-sync.git
+[submodule "property-mapping-server"]
+	path = property-mapping-server
+	url = git@github.com:hubspotdev/property-mapping-server.git
+[submodule "associations-sync-server"]
+	path = associations-sync-server
+	url = git@github.com:hubspotdev/associations-sync-server.git
+[submodule "property-mapping-client"]
+	path = property-mapping-client
+	url = git@github.com:hubspotdev/property-mapping-client.git
