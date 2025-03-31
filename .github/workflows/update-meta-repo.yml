@@ -10,12 +10,12 @@ jobs:
     steps:
       - name: Checkout the meta-repository
         run: |
-          git clone --recurse-submodules https://x-access-token:${{ secrets.GH_PAT }}@github.com/your-org/meta-repo.git
-          cd meta-repo
+          git clone --recurse-submodules https://x-access-token:${{ secrets.GH_PAT }}@github.com/hubspotdev/CODE-Hub.git
+          cd CODE-Hub
 
       - name: Update submodules
         run: |
-          cd meta-repo
+          cd CODE-Hub
           git submodule update --remote --merge
 
       - name: Extract repo and commit info
@@ -27,7 +27,7 @@ jobs:
 
       - name: Commit and push changes
         run: |
-          cd meta-repo
+          cd CODE-Hub
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
