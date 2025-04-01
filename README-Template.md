@@ -6,6 +6,7 @@ Brief description of what this project does.
 - [What this project does](#what-this-project-does)
 - [Why is this project useful](#why-is-this-project-useful)
 - [Setup](#setup)
+  - [Docker Setup](#docker-setup)
 - [Scopes](#scopes)
 - [Endpoints](#endpoints)
   - [Group One](#group-one)
@@ -40,6 +41,14 @@ KEY_TWO=value
 
 3. **Additional Setup Steps**
 Any other necessary setup instructions.
+
+### Docker Setup
+
+To run this project using Docker, follow these steps:
+
+1. **Run Docker Compose**  
+   ```docker-compose up -d```
+2. **Other Docker Commands/Steps**
 
 ## Scopes
 
