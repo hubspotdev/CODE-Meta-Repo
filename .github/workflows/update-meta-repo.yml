@@ -2,6 +2,7 @@ name: Update Meta Repo on PR Merge
 
 on:
   repository_dispatch:
+  workflow_dispatch:
 
 jobs:
   update-meta-repo:
