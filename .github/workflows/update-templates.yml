@@ -64,7 +64,7 @@ jobs:
 
       - name: Upload PR Template content
         if: steps.check_files.outputs.pr_updated == 'true'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: pr-template-${{ matrix.repo }}
           path: PR-Template.md
@@ -72,7 +72,7 @@ jobs:
 
       - name: Upload Bug Template content
         if: steps.check_files.outputs.bug_updated == 'true'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: bug-template-${{ matrix.repo }}
           path: Bug-Issue-Template.md
