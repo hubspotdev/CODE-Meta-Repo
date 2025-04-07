@@ -1,0 +1,79 @@
+name: Update Template Files in Submodules
+
+on:
+  push:
+    paths:
+      - 'PR-Template.md'
+      - 'Bug-Issue-Template.md'
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  update-templates:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        repo:
+          [
+            'associations-sync-server',
+            'crm-object-sync',
+            'property-mapping-client',
+            'property-mapping-server'
+          ]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check for template changes
+        id: check_files
+        run: |
+          PR_TEMPLATE_UPDATED=false
+          BUG_TEMPLATE_UPDATED=false
+
+          git fetch origin
+
+          if git diff --name-only HEAD^ HEAD | grep -q "PR-Template.md"; then
+            PR_TEMPLATE_UPDATED=true
+          fi
+
+          if git diff --name-only HEAD^ HEAD | grep -q "Bug-Issue-Template.md"; then
+            BUG_TEMPLATE_UPDATED=true
+          fi
+
+          echo "pr_updated=$PR_TEMPLATE_UPDATED" >> $GITHUB_OUTPUT
+          echo "bug_updated=$BUG_TEMPLATE_UPDATED" >> $GITHUB_OUTPUT
+
+      - name: Create repository dispatch event
+        if: steps.check_files.outputs.pr_updated == 'true' || steps.check_files.outputs.bug_updated == 'true'
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.GH_PAT }}
+          repository: hubspotdev/${{ matrix.repo }}
+          event-type: update-templates
+          client-payload: |
+            {
+              "pr_template_updated": "${{ steps.check_files.outputs.pr_updated }}",
+              "bug_template_updated": "${{ steps.check_files.outputs.bug_updated }}",
+              "pr_template_content": "${{ steps.check_files.outputs.pr_updated == 'true' && 'true' || 'false' }}",
+              "bug_template_content": "${{ steps.check_files.outputs.bug_updated == 'true' && 'true' || 'false' }}",
+              "source_repo": "CODE-Hub"
+            }
+
+      - name: Upload PR Template content
+        if: steps.check_files.outputs.pr_updated == 'true'
+        uses: actions/upload-artifact@v3
+        with:
+          name: pr-template-${{ matrix.repo }}
+          path: PR-Template.md
+          retention-days: 1
+
+      - name: Upload Bug Template content
+        if: steps.check_files.outputs.bug_updated == 'true'
+        uses: actions/upload-artifact@v3
+        with:
+          name: bug-template-${{ matrix.repo }}
+          path: Bug-Issue-Template.md
+          retention-days: 1
