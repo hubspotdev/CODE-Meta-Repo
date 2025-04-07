@@ -15,10 +15,11 @@ jobs:
 
     strategy:
       matrix:
-        repo: [
-            # 'associations-sync-server',
-            # 'crm-object-sync',
-            # 'property-mapping-client',
+        repo:
+          [
+            'associations-sync-server',
+            'crm-object-sync',
+            'property-mapping-client',
             'property-mapping-server'
           ]
 
