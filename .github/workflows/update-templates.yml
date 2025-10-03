@@ -22,6 +22,7 @@ jobs:
             'property-mapping-client',
             'property-mapping-server'
           ]
+        # Security: Repository names are hardcoded to prevent injection
 
     steps:
       - name: Checkout repository
@@ -57,11 +58,11 @@ jobs:
           event-type: update-templates
           client-payload: |
             {
-              "pr_template_updated": "${{ steps.check_files.outputs.pr_updated }}",
-              "bug_template_updated": "${{ steps.check_files.outputs.bug_updated }}",
-              "pr_template_content": "${{ steps.check_files.outputs.pr_updated == 'true' && 'true' || 'false' }}",
-              "bug_template_content": "${{ steps.check_files.outputs.bug_updated == 'true' && 'true' || 'false' }}",
-              "source_repo": "CODE-Hub"
+              "pr_template_updated": ${{ toJson(steps.check_files.outputs.pr_updated) }},
+              "bug_template_updated": ${{ toJson(steps.check_files.outputs.bug_updated) }},
+              "pr_template_content": ${{ toJson(steps.check_files.outputs.pr_updated == 'true') }},
+              "bug_template_content": ${{ toJson(steps.check_files.outputs.bug_updated == 'true') }},
+              "source_repo": ${{ toJson('CODE-Hub') }}
             }
 
       - name: Upload PR Template content

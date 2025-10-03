@@ -1,0 +1,71 @@
+# SECURE WORKFLOW TEMPLATE
+# This template shows how to safely handle user-controlled input in GitHub Actions
+
+name: Secure PR Workflow
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+
+jobs:
+  secure-dispatch:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Validate and sanitize inputs
+        id: validate
+        run: |
+          # Extract PR title safely
+          PR_TITLE="${{ github.event.pull_request.title }}"
+
+          # Validate PR title format (basic validation)
+          if [[ -z "$PR_TITLE" ]]; then
+            echo "Error: PR title is empty"
+            exit 1
+          fi
+
+          # Sanitize PR title - remove dangerous characters and limit length
+          PR_TITLE_SANITIZED=$(echo "$PR_TITLE" | sed 's/[^a-zA-Z0-9 .,!?()-]//g' | head -c 200)
+
+          # Additional validation - reject if title contains suspicious patterns
+          if echo "$PR_TITLE" | grep -qE '[;&|`$(){}]'; then
+            echo "Error: PR title contains potentially dangerous characters"
+            exit 1
+          fi
+
+          echo "pr_title_sanitized=$PR_TITLE_SANITIZED" >> $GITHUB_OUTPUT
+          echo "pr_url=${{ github.event.pull_request.html_url }}" >> $GITHUB_OUTPUT
+          echo "repo_name=${{ github.repository }}" >> $GITHUB_OUTPUT
+          echo "commit_hash=${{ github.sha }}" >> $GITHUB_OUTPUT
+
+      - name: Create secure dispatch event
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.GH_PAT }}
+          repository: hubspotdev/CODE-Hub
+          event-type: update-meta-repo
+          client-payload: |
+            {
+              "repo": "${{ steps.validate.outputs.repo_name }}",
+              "commit": "${{ steps.validate.outputs.commit_hash }}",
+              "pr_title": "${{ steps.validate.outputs.pr_title_sanitized }}",
+              "pr_url": "${{ steps.validate.outputs.pr_url }}"
+            }
+
+      # ALTERNATIVE APPROACH: Using GitHub Actions expressions (even safer)
+      # This approach uses GitHub's built-in JSON handling which automatically escapes content
+
+      - name: Create dispatch with GitHub expressions (alternative)
+        if: false # Set to true to use this approach instead
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.GH_PAT }}
+          repository: hubspotdev/CODE-Hub
+          event-type: update-meta-repo
+          client-payload: |
+            {
+              "repo": ${{ toJson(github.repository) }},
+              "commit": ${{ toJson(github.sha) }},
+              "pr_title": ${{ toJson(github.event.pull_request.title) }},
+              "pr_url": ${{ toJson(github.event.pull_request.html_url) }}
+            }

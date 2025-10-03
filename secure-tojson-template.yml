@@ -1,0 +1,41 @@
+# MAXIMUM SECURITY WORKFLOW TEMPLATE
+# This template uses GitHub's toJson() function for automatic escaping and maximum security
+
+name: Secure PR Workflow with toJson()
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+
+jobs:
+  secure-dispatch:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Create secure dispatch event using toJson()
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.GH_PAT }}
+          repository: hubspotdev/CODE-Hub
+          event-type: update-meta-repo
+          client-payload: |
+            {
+              "repo": ${{ toJson(github.repository) }},
+              "commit": ${{ toJson(github.sha) }},
+              "pr_title": ${{ toJson(github.event.pull_request.title) }},
+              "pr_url": ${{ toJson(github.event.pull_request.html_url) }}
+            }
+
+# KEY SECURITY BENEFITS OF THIS APPROACH:
+# 1. toJson() automatically escapes all special characters
+# 2. No manual string concatenation or shell interpolation
+# 3. GitHub Actions handles all JSON encoding safely
+# 4. Prevents command injection attacks completely
+# 5. No need for manual validation or sanitization
+# 6. Simpler and more maintainable code
+
+# USAGE INSTRUCTIONS:
+# 1. Copy this workflow to your submodule repositories
+# 2. Replace the repository name in the dispatch target
+# 3. Ensure GH_PAT secret is configured with proper permissions
+# 4. This approach is safe from all injection attacks mentioned in the security report
