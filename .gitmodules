@@ -13,3 +13,7 @@
 [submodule "property-mapping-server"]
     path = property-mapping-server
     url = https://github.com/hubspotdev/property-mapping-server.git
+
+[submodule "webhooks-journal-example"]
+    path = webhooks-journal-example
+    url = https://github.com/hubspotdev/webhooks-journal-example.git
